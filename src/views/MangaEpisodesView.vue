@@ -1,10 +1,10 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import axios from 'axios'
 import { ref, watch, computed } from 'vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ScrollTop from 'primevue/scrolltop'
 import Button from 'primevue/button'
+import apiClient from '@/services/api'
 
 const route = useRoute()
 const chapterId = ref(route.params.id)
@@ -24,7 +24,7 @@ const currentPage = computed(() => {
 const getPages = async () => {
   loading.value = true
   try {
-    const response = await axios.get(`/api/asurascans/pages/${chapterId.value}`)
+    const response = await apiClient.get(`/asurascans/pages/${chapterId.value}`)
     pages.value = response.data.results
   } catch (error) {
     console.error(error)

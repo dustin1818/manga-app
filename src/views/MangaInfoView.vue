@@ -1,10 +1,10 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
-import axios from 'axios'
 import Button from 'primevue/button'
 import SocialShareButtons from '@/components/SocialShareButtons.vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import EpisodesList from '@/components/EpisodesList.vue'
+import apiClient from '@/services/api'
 
 const mangaId = 'leviathan'
 const manga = reactive({
@@ -20,7 +20,7 @@ const toggleMoreInfo = () => {
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`/api/asurascans/info/${mangaId}`)
+    const response = await apiClient.get(`/asurascans/info/${mangaId}`)
     const data = await response.data
     manga.data = data.results[0]
   } catch (error) {
