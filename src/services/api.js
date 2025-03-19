@@ -1,9 +1,15 @@
 import axios from 'axios'
 
 // Create a base URL that adapts to the environment
-const baseURL = import.meta.env.PROD
+// We need to check if we're in production more reliably
+const isProduction =
+  window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+
+const baseURL = isProduction
   ? 'https://manga-scrapers.onrender.com' // Production API URL
   : '/api' // Development (will use the Vite proxy)
+
+console.log('API Client initialized with baseURL:', baseURL)
 
 // Create an axios instance with the correct base URL
 const apiClient = axios.create({
@@ -12,5 +18,16 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+// Add request interceptor for debugging
+apiClient.interceptors.request.use(
+  (config) => {
+    console.log('Making request to:', config.baseURL + config.url)
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 
 export default apiClient

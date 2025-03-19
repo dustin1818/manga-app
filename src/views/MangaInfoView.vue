@@ -10,6 +10,7 @@ const mangaId = 'leviathan'
 const manga = reactive({
   data: {},
   loading: true,
+  error: null,
 })
 
 const showMoreInfo = ref(false)
@@ -20,11 +21,21 @@ const toggleMoreInfo = () => {
 
 onMounted(async () => {
   try {
+    console.log('Fetching manga info for:', mangaId)
     const response = await apiClient.get(`/asurascans/info/${mangaId}`)
-    const data = await response.data
-    manga.data = data.results[0]
+    console.log('Response received:', response)
+
+    const data = response.data
+    if (data && data.results && data.results[0]) {
+      manga.data = data.results[0]
+      console.log('Manga data processed:', manga.data)
+    } else {
+      console.error('Invalid response format:', data)
+      manga.error = 'Invalid response data format'
+    }
   } catch (error) {
-    console.error(error)
+    console.error('Error fetching manga info:', error)
+    manga.error = error.message || 'Failed to fetch manga information'
   } finally {
     manga.loading = false
   }
@@ -34,6 +45,14 @@ onMounted(async () => {
 <template>
   <div v-if="manga.loading" class="w-full h-screen grid items-center">
     <PulseLoader class="m-auto" color="#9333EA" />
+  </div>
+
+  <div v-else-if="manga.error" class="w-full h-screen grid items-center">
+    <div class="text-center">
+      <h2 class="text-red-500 text-xl mb-2">Error loading manga</h2>
+      <p>{{ manga.error }}</p>
+      <Button label="Retry" icon="pi pi-refresh" @click="window.location.reload()" class="mt-4" />
+    </div>
   </div>
 
   <div v-else class="manga-info-view p-4 md:p-5">

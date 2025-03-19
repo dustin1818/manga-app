@@ -10,6 +10,7 @@ const route = useRoute()
 const chapterId = ref(route.params.id)
 const pages = ref([])
 const loading = ref(true)
+const error = ref(null)
 
 // Create a reactive object for currentPage
 const currentPage = computed(() => {
@@ -23,11 +24,23 @@ const currentPage = computed(() => {
 
 const getPages = async () => {
   loading.value = true
+  error.value = null
+
   try {
+    console.log('Fetching pages for chapter:', chapterId.value)
     const response = await apiClient.get(`/asurascans/pages/${chapterId.value}`)
-    pages.value = response.data.results
-  } catch (error) {
-    console.error(error)
+    console.log('Response received:', response)
+
+    if (response.data && response.data.results) {
+      pages.value = response.data.results
+      console.log('Pages loaded:', pages.value.length)
+    } else {
+      console.error('Invalid response format:', response.data)
+      error.value = 'Invalid response data format'
+    }
+  } catch (err) {
+    console.error('Error fetching pages:', err)
+    error.value = err.message || 'Failed to fetch manga pages'
   } finally {
     loading.value = false
   }
@@ -61,6 +74,38 @@ const nextChapterUrl = computed(() =>
   <div class="flex flex-col items-center">
     <div v-if="loading" class="h-screen w-full flex justify-center items-center">
       <PulseLoader color="#9333EA" />
+    </div>
+
+    <div v-else-if="error" class="h-screen w-full flex justify-center items-center flex-col">
+      <div class="text-center">
+        <h2 class="text-red-500 text-xl mb-2">Error loading pages</h2>
+        <p>{{ error }}</p>
+        <Button label="Retry" icon="pi pi-refresh" @click="getPages()" class="mt-4" />
+        <div class="mt-4">
+          <RouterLink to="/asurascans/info/leviathan">
+            <Button iconPos="left" label="Back to Info page" icon="pi pi-arrow-left" size="small" />
+          </RouterLink>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-else-if="pages.length === 0"
+      class="h-screen w-full flex justify-center items-center flex-col"
+    >
+      <div class="text-center">
+        <h2 class="text-yellow-500 text-xl mb-2">No pages found</h2>
+        <p>This chapter may not be available</p>
+        <RouterLink to="/asurascans/info/leviathan">
+          <Button
+            iconPos="left"
+            label="Back to Info page"
+            icon="pi pi-arrow-left"
+            size="small"
+            class="mt-4"
+          />
+        </RouterLink>
+      </div>
     </div>
 
     <div v-else class="w-full flex justify-center items-center flex-col">
