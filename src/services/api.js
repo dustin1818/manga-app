@@ -5,8 +5,9 @@ import axios from 'axios'
 const isProduction =
   window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
 
+// For production, use a CORS proxy to avoid CORS errors
 const baseURL = isProduction
-  ? 'https://manga-scrapers.onrender.com' // Production API URL
+  ? 'https://corsproxy.io/?https://manga-scrapers.onrender.com' // Production API URL with CORS proxy
   : '/api' // Development (will use the Vite proxy)
 
 console.log('API Client initialized with baseURL:', baseURL)
