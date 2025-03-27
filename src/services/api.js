@@ -12,9 +12,14 @@ const apiClient = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    Pragma: 'no-cache',
-    Expires: '0',
+    // Only add cache-control headers when not using CORS proxy
+    ...(isProduction
+      ? {}
+      : {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        }),
   },
 })
 
