@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [vue(), vueDevTools()],
 
   // More explicit configuration
-  base: './',
+  base: '/',
 
   server: {
     port: 4200,
