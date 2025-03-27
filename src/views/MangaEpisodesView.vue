@@ -63,7 +63,7 @@ watch(
 const chapterUrl = (chapter) => `/asurascans/pages/leviathan-chapter-${chapter}`
 
 const previousChapterUrl = computed(() =>
-  currentPage.value.previous === 0 ? chapterUrl(currentPage.value.previous) : 0,
+  currentPage.value.previous !== 0 ? chapterUrl(currentPage.value.previous) : 0,
 )
 
 const nextChapterUrl = computed(() =>

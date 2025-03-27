@@ -5,6 +5,10 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
+
+  // More explicit configuration
+  base: './',
+
   server: {
     port: 4200,
     proxy: {
@@ -20,8 +24,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // Add these new configurations
   build: {
+    outDir: 'dist',
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -31,6 +35,9 @@ export default defineConfig({
         },
       },
     },
+    // Ensure modules are processed correctly
+    modulePreload: {
+      polyfill: true,
+    },
   },
-  base: './',
 })
