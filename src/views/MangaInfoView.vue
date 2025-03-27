@@ -1,56 +1,36 @@
 <script setup>
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import Button from 'primevue/button'
 import SocialShareButtons from '@/components/SocialShareButtons.vue'
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import EpisodesList from '@/components/EpisodesList.vue'
-import apiClient from '@/services/api'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import { useMangaStore } from '@/state/store'
 
-const mangaId = 'leviathan'
-const manga = reactive({
-  data: {},
-  loading: true,
-  error: null,
-})
-
+const mangaStore = useMangaStore()
 const showMoreInfo = ref(false)
-
 const toggleMoreInfo = () => {
   showMoreInfo.value = !showMoreInfo.value
 }
+const genres = computed(() => {
+  if (!mangaStore.manga.data.genres) return []
+  return mangaStore.manga.data.genres.split(', ').map((genre) => genre.trim())
+})
 
-onMounted(async () => {
-  try {
-    console.log('Fetching manga info for:', mangaId)
-    const response = await apiClient.get(`/asurascans/info/${mangaId}`)
-    console.log('Response received:', response)
-
-    const data = response.data
-    if (data && data.results && data.results[0]) {
-      manga.data = data.results[0]
-      console.log('Manga data processed:', manga.data)
-    } else {
-      console.error('Invalid response format:', data)
-      manga.error = 'Invalid response data format'
-    }
-  } catch (error) {
-    console.error('Error fetching manga info:', error)
-    manga.error = error.message || 'Failed to fetch manga information'
-  } finally {
-    manga.loading = false
-  }
+onMounted(() => {
+  mangaStore.fetchMangaInfo()
 })
 </script>
 
 <template>
-  <div v-if="manga.loading" class="w-full h-screen grid items-center">
+  <div v-if="mangaStore.manga.loading" class="w-full h-screen grid items-center">
     <PulseLoader class="m-auto" color="#9333EA" />
   </div>
 
-  <div v-else-if="manga.error" class="w-full h-screen grid items-center">
+  <div v-else-if="mangaStore.manga.error" class="w-full h-screen grid items-center">
     <div class="text-center">
       <h2 class="text-red-500 text-xl mb-2">Error loading manga</h2>
-      <p>{{ manga.error }}</p>
+      <p>{{ mangaStore.manga.error }}</p>
       <Button label="Retry" icon="pi pi-refresh" @click="window.location.reload()" class="mt-4" />
     </div>
   </div>
@@ -59,18 +39,19 @@ onMounted(async () => {
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 place-items-center md:place-items-start">
       <div class="img-wrapper w-3/4 md:w-full">
         <img
-          :src="manga.data.images"
-          :alt="manga.data.images"
+          :src="mangaStore.manga.data.images"
+          :alt="mangaStore.manga.data.images"
           class="w-full object-cover rounded-lg shadow-md"
         />
       </div>
 
       <div class="info-wrapper text-center md:text-start md:col-span-3">
-        <span class="text-2xl font-bold">{{ mangaId.toLocaleUpperCase() }}</span>
-        <p class="mt-2 mb-8">Lviathan; Simhaesu; Deepwater</p>
-
+        <span class="text-2xl font-bold">{{ mangaStore.mangaId.toLocaleUpperCase() }}</span>
+        <p class="mt-2 mb-8">Leviathan, Simhaesu, Deepwater</p>
         <div class="btn-container w-full flex justify-center md:justify-start flex-wrap gap-3 mb-8">
-          <Button label="Start Reading" icon="pi pi-play" iconPos="right" raised />
+          <RouterLink to="/asurascans/pages/leviathan-chapter-1">
+            <Button label="Start Reading" icon="pi pi-play" iconPos="right" raised />
+          </RouterLink>
           <Button
             label="Boomarks"
             icon="pi pi-bookmark"
@@ -80,25 +61,10 @@ onMounted(async () => {
           />
         </div>
 
-        <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-4">
-          <span>Status</span>
-          <span>Completed</span>
-          <span>Completed</span>
-        </div>
-
         <p class="text-sm mb-6 md:text-base">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta, dolorum! Eius rem nihil
-          dolor alias esse ad illum quaerat similique. Odit ea culpa, sed ratione repudiandae
-          exercitationem dolorum aut facilis? Error consequatur necessitatibus sunt quia, ipsa
-          voluptate veniam delectus iste corporis impedit praesentium vero saepe officiis nemo
-          beatae nisi cum a ipsam quisquam? Perspiciatis voluptate itaque nobis provident
-          consequatur a. Illo maxime omnis soluta aliquam magnam perferendis tenetur ad alias ut rem
-          aliquid veniam expedita sapiente quis unde, minima perspiciatis harum pariatur? Aut
-          voluptate alias nesciunt dolorum quaerat consequuntur aspernatur.
+          {{ mangaStore.manga.data.description }}
         </p>
-
         <SocialShareButtons :shareCount="42" :url="``" :title="``" />
-
         <div
           @click="toggleMoreInfo"
           class="mt-8 flex align-center md:justify-center text-white w-full md:w-[260px] bg-gray-800 p-2 gap-3 rounded hover:bg-violet-700 cursor-pointer hover:text-gray-100 transition-all duration-300 hover:scale-105"
@@ -110,38 +76,42 @@ onMounted(async () => {
 
         <div
           class="more-info-container overflow-hidden transition-all duration-400 ease-in-out"
-          :class="{ 'max-h-[500px] opacity-100': showMoreInfo, 'max-h-0 opacity-0': !showMoreInfo }"
+          :class="{
+            'max-h-[500px] opacity-100': showMoreInfo,
+            'max-h-0 opacity-0': !showMoreInfo,
+          }"
         >
           <div class="flex flex-col w-full mt-3 mb-3">
             <div class="border-b border-gray-200 pb-4 grid gap-2">
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
-                <span class="text-gray-600">Author:</span>
-                <span class="text-black">Miyoung Noh, Gyuntak Lee</span>
+                <span class="text-gray-600">Author and Artist:</span>
+                <span class="text-black"
+                  >{{ mangaStore.manga.data.author[0] }},
+                  {{ mangaStore.manga.data.artists[0] }}</span
+                >
               </div>
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
                 <span class="text-gray-600">Published:</span>
-                <span class="text-black">Mar 12, 2018 to Apr 01, 2022</span>
+                <span class="text-black">{{ mangaStore.manga.data.year }}</span>
               </div>
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
                 <span class="text-gray-600 justify-center">Genres:</span>
                 <div class="flex flex-wrap gap-2">
-                  <span class="bg-violet-600 text-white text-sm px-3 py-1 rounded-full"
-                    >Action</span
+                  <span
+                    v-for="genre in genres"
+                    :key="genre"
+                    class="bg-violet-600 text-white text-sm px-3 py-1 rounded-full"
                   >
-                  <span class="bg-violet-600 text-white text-sm px-3 py-1 rounded-full"
-                    >Adventure</span
-                  >
-                  <span class="bg-violet-600 text-white text-sm px-3 py-1 rounded-full"
-                    >Fantasy</span
-                  >
+                    {{ genre }}
+                  </span>
                 </div>
               </div>
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                 <span class="text-gray-600">Magazines:</span>
-                <span class="text-black">Toomics</span>
+                <span class="text-black">{{ mangaStore.manga.data.serialization[0] }}</span>
               </div>
             </div>
 
@@ -164,6 +134,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <EpisodesList :chapters="manga.data.chapters" />
+    <EpisodesList />
   </div>
 </template>

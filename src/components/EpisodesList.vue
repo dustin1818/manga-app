@@ -1,17 +1,13 @@
 <script setup>
 import { reactive } from 'vue'
-const props = defineProps({
-  chapters: {
-    type: Array,
-  },
-})
+import { useMangaStore } from '@/state/store'
 
+const mangaStore = useMangaStore()
 const isChapterHovered = reactive({
   active: false,
   chapter: {},
   index: null,
 })
-
 const handleChapterHover = (index) => {
   isChapterHovered.index = index
   if (isChapterHovered.index === index) {
@@ -38,6 +34,7 @@ const handleRemoveChapterHover = (index) => {
           <input
             type="text"
             placeholder="Chapter number..."
+            v-model="mangaStore.searchInput"
             class="bg-gray-800 rounded-lg px-4 py-2 text-sm w-56 pr-10 focus:outline-none focus:ring-2 focus:ring-violet-800"
           />
           <i class="pi pi-search absolute right-3 top-2.5 text-gray-400 hover:text-violet-400"></i>
@@ -46,7 +43,7 @@ const handleRemoveChapterHover = (index) => {
 
       <ul class="divide-y divide-gray-600 overflow-y-scroll h-[500px]">
         <RouterLink
-          v-for="(chapter, index) of props.chapters"
+          v-for="(chapter, index) of mangaStore.searchChapter"
           :key="chapter.id"
           :to="`/asurascans/pages/${chapter.id}`"
         >

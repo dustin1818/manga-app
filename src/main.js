@@ -1,5 +1,6 @@
 import './assets/main.css'
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import { definePreset } from '@primeuix/themes'
 import PrimeVue from 'primevue/config'
@@ -7,6 +8,8 @@ import Aura from '@primeuix/themes/aura'
 import router from './router'
 
 const app = createApp(App)
+const pinia = createPinia()
+
 const MyPreset = definePreset(Aura, {
   semantic: {
     primary: {
@@ -35,5 +38,6 @@ app.use(PrimeVue, {
   },
 })
 
+app.use(pinia)
 app.use(router)
 app.mount('#app')

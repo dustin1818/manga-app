@@ -1,20 +1,24 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { ref, watch, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ScrollTop from 'primevue/scrolltop'
 import Button from 'primevue/button'
 import apiClient from '@/services/api'
 
 const route = useRoute()
-const chapterId = ref(route.params.id)
-const pages = ref([])
-const loading = ref(true)
-const error = ref(null)
+
+// Use reactive to create a single state object
+const state = reactive({
+  chapterId: route.params.id,
+  pages: [],
+  loading: true,
+  error: null,
+})
 
 // Create a reactive object for currentPage
 const currentPage = computed(() => {
-  const chapterNum = parseInt(chapterId.value.split('-').pop())
+  const chapterNum = parseInt(state.chapterId.split('-').pop())
   return {
     current: chapterNum,
     previous: chapterNum - 1,
@@ -23,26 +27,26 @@ const currentPage = computed(() => {
 })
 
 const getPages = async () => {
-  loading.value = true
-  error.value = null
+  state.loading = true
+  state.error = null
 
   try {
-    console.log('Fetching pages for chapter:', chapterId.value)
-    const response = await apiClient.get(`/asurascans/pages/${chapterId.value}`)
+    console.log('Fetching pages for chapter:', state.chapterId)
+    const response = await apiClient.get(`/asurascans/pages/${state.chapterId}`)
     console.log('Response received:', response)
 
     if (response.data && response.data.results) {
-      pages.value = response.data.results
-      console.log('Pages loaded:', pages.value.length)
+      state.pages = response.data.results
+      console.log('Pages loaded:', state.pages.length)
     } else {
       console.error('Invalid response format:', response.data)
-      error.value = 'Invalid response data format'
+      state.error = 'Invalid response data format'
     }
   } catch (err) {
     console.error('Error fetching pages:', err)
-    error.value = err.message || 'Failed to fetch manga pages'
+    state.error = err.message || 'Failed to fetch manga pages'
   } finally {
-    loading.value = false
+    state.loading = false
   }
 }
 
@@ -50,7 +54,7 @@ const getPages = async () => {
 watch(
   () => route.params.id,
   (newId) => {
-    chapterId.value = newId
+    state.chapterId = newId
     getPages()
   },
   { immediate: true },
@@ -72,14 +76,14 @@ const nextChapterUrl = computed(() =>
 
 <template>
   <div class="flex flex-col items-center">
-    <div v-if="loading" class="h-screen w-full flex justify-center items-center">
+    <div v-if="state.loading" class="h-screen w-full flex justify-center items-center">
       <PulseLoader color="#9333EA" />
     </div>
 
-    <div v-else-if="error" class="h-screen w-full flex justify-center items-center flex-col">
+    <div v-else-if="state.error" class="h-screen w-full flex justify-center items-center flex-col">
       <div class="text-center">
         <h2 class="text-red-500 text-xl mb-2">Error loading pages</h2>
-        <p>{{ error }}</p>
+        <p>{{ state.error }}</p>
         <Button label="Retry" icon="pi pi-refresh" @click="getPages()" class="mt-4" />
         <div class="mt-4">
           <RouterLink to="/asurascans/info/leviathan">
@@ -90,7 +94,7 @@ const nextChapterUrl = computed(() =>
     </div>
 
     <div
-      v-else-if="pages.length === 0"
+      v-else-if="state.pages.length === 0"
       class="h-screen w-full flex justify-center items-center flex-col"
     >
       <div class="text-center">
@@ -110,7 +114,7 @@ const nextChapterUrl = computed(() =>
 
     <div v-else class="w-full flex justify-center items-center flex-col">
       <img
-        v-for="(page, index) in pages"
+        v-for="(page, index) in state.pages"
         :key="index"
         :src="`${page}`"
         alt="page"
