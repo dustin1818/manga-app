@@ -1,10 +1,17 @@
 <script setup>
 import { RouterLink } from 'vue-router'
+import { ref } from 'vue'
+
+const isMenuOpen = ref(false)
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+}
 </script>
 
 <template>
-  <nav class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <nav class="bg-white shadow-md relative">
+    <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
           <RouterLink to="/" class="flex-shrink-0 flex items-center">
@@ -18,17 +25,17 @@ import { RouterLink } from 'vue-router'
             >
               <path
                 d="M25.87 18.05L23.16 17.45L25.27 20.46V29.78L32.49 23.76V13.53L29.18 14.73L25.87 18.04V18.05ZM25.27 35.49L29.18 31.58V27.67L25.27 30.98V35.49ZM20.16 17.14H20.03H20.17H20.16ZM30.1 5.19L34.89 4.81L33.08 12.33L24.1 15.67L30.08 5.2L30.1 5.19ZM5.72 14.74L2.41 13.54V23.77L9.63 29.79V20.47L11.74 17.46L9.03 18.06L5.72 14.75V14.74ZM9.63 30.98L5.72 27.67V31.58L9.63 35.49V30.98ZM4.8 5.2L10.78 15.67L1.81 12.33L0 4.81L4.79 5.19L4.8 5.2ZM24.37 21.05V34.59L22.56 37.29L20.46 39.4H14.44L12.34 37.29L10.53 34.59V21.05L12.42 18.23L17.45 26.8L22.48 18.23L24.37 21.05ZM22.85 0L22.57 0.69L17.45 13.08L12.33 0.69L12.05 0H22.85Z"
-                fill="var(--p-primary-color)"
+                fill="#9333EA"
               />
               <path
                 d="M30.69 4.21L24.37 4.81L22.57 0.69L22.86 0H26.48L30.69 4.21ZM23.75 5.67L22.66 3.08L18.05 14.24V17.14H19.7H20.03H20.16H20.2L24.1 15.7L30.11 5.19L23.75 5.67ZM4.21002 4.21L10.53 4.81L12.33 0.69L12.05 0H8.43002L4.22002 4.21H4.21002ZM21.9 17.4L20.6 18.2H14.3L13 17.4L12.4 18.2L12.42 18.23L17.45 26.8L22.48 18.23L22.5 18.2L21.9 17.4ZM4.79002 5.19L10.8 15.7L14.7 17.14H14.74H15.2H16.85V14.24L12.24 3.09L11.15 5.68L4.79002 5.2V5.19Z"
-                fill="var(--p-text-color)"
+                fill="#111827"
               />
             </svg>
           </RouterLink>
 
-          <!-- Navigation Links -->
-          <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+          <!-- Desktop Navigation Links -->
+          <div class="hidden md:ml-6 md:flex md:space-x-8">
             <RouterLink
               to="/"
               class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500"
@@ -55,6 +62,83 @@ import { RouterLink } from 'vue-router'
             </RouterLink>
           </div>
         </div>
+
+        <!-- Mobile menu button -->
+        <div class="flex items-center md:hidden">
+          <button
+            @click="toggleMenu"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+          >
+            <span class="sr-only">Open main menu</span>
+            <svg
+              class="block h-6 w-6"
+              :class="{ hidden: isMenuOpen }"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <svg
+              class="h-6 w-6"
+              :class="{ hidden: !isMenuOpen }"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      :class="{ block: isMenuOpen, hidden: !isMenuOpen }"
+      class="md:hidden absolute w-full bg-white shadow-lg z-50"
+    >
+      <div class="px-2 pt-2 pb-3 space-y-1">
+        <RouterLink
+          to="/"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-purple-50 hover:text-purple-700"
+          @click="isMenuOpen = false"
+        >
+          Home
+        </RouterLink>
+        <RouterLink
+          to="/asurascans/popular"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-purple-50 hover:text-purple-700"
+          @click="isMenuOpen = false"
+        >
+          Popular
+        </RouterLink>
+        <RouterLink
+          to="/asurascans/latest"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-purple-50 hover:text-purple-700"
+          @click="isMenuOpen = false"
+        >
+          Latest
+        </RouterLink>
+        <RouterLink
+          to="/asurascans/search"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-purple-50 hover:text-purple-700"
+          @click="isMenuOpen = false"
+        >
+          Search
+        </RouterLink>
       </div>
     </div>
   </nav>

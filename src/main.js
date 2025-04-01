@@ -34,7 +34,7 @@ app.use(PrimeVue, {
   options: {
     //enable dark mode if ready to use it
     // darkModeSelector: '.my-app-dark',
-    // darkModeSelector: false || 'none',
+    darkModeSelector: false || 'none',
   },
 })
 

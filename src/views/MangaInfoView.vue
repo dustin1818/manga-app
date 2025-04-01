@@ -29,6 +29,8 @@ onMounted(() => {
   } else if (mangaStore.mangaId.value) {
     mangaStore.fetchMangaInfo()
   }
+
+  mangaStore.searchInput = ''
 })
 </script>
 
@@ -61,7 +63,7 @@ onMounted(() => {
           class="btn-container mt-8 w-full flex justify-center md:justify-start flex-wrap gap-3 mb-8"
         >
           <RouterLink
-            :to="`/asurascans/pages/${mangaStore.manga.data.chapters[mangaStore.manga.data.chapters.length - 1].id}`"
+            :to="`/asurascans/pages/${mangaStore.manga.data.chapters[mangaStore.manga.data.chapters?.length - 1].id}`"
           >
             <Button label="Start Reading" icon="pi pi-play" iconPos="right" raised />
           </RouterLink>

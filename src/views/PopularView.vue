@@ -19,25 +19,25 @@ onMounted(async () => {
 
 <template>
   <div v-if="mangaStore.manga.loading" class="w-full h-screen grid items-center">
-    <PulseLoader class="m-auto" color="#9333EA" />
+    <PulseLoader class="m-auto" color="#9333EA" size="10px" />
   </div>
   <div v-else-if="mangaStore.manga.error" class="w-full h-screen grid items-center">
     <div class="text-center">
-      <h1 class="text-2xl font-bold mb-6">Error loading manga</h1>
+      <h1 class="text-xl font-bold mb-6">Error loading manga</h1>
       <p>{{ mangaStore.manga.error }}</p>
     </div>
   </div>
-  <div v-else class="max-w-7xl mx-auto p-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-bold mb-6">Popular Manga</h1>
+  <div v-else class="max-w-7xl mx-auto px-4 py-4">
+    <h1 class="text-xl font-bold mb-6">Popular Manga</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-6">
       <RouterLink
         :to="`/asurascans/info/${manga.id}`"
         v-for="manga in popularManga"
         :key="manga.id"
       >
         <div
-          class="relative h-72 rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-xl"
+          class="relative h-52 md:h-72 rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-xl"
         >
           <img
             :src="manga.image"
