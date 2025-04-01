@@ -1,6 +1,7 @@
 import HomeView from '@/views/HomeView.vue'
 import MangaEpisodesView from '@/views/MangaEpisodesView.vue'
 import MangaInfoView from '@/views/MangaInfoView.vue'
+import PopularView from '@/views/PopularView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/asurascans/pages/:id',
       name: 'pages',
       component: MangaEpisodesView,
+    },
+    {
+      path: '/asurascans/popular',
+      name: 'popular',
+      component: PopularView,
     },
   ],
 })

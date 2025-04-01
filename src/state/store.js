@@ -30,11 +30,28 @@ export const useMangaStore = defineStore('manga', () => {
     }
   }
 
+  const fetchPopularManga = async () => {
+    try {
+      const response = await apiClient.get('/asurascans/popular')
+      const data = response.data
+      if (data && data.results) {
+        manga.popular = data.results
+      } else {
+        manga.error = 'Invalid response data format'
+      }
+    } catch (error) {
+      manga.error = error.message || 'Failed to fetch popular manga'
+    } finally {
+      manga.loading = false
+    }
+  }
+
   return {
     mangaId,
     manga,
     fetchMangaInfo,
     searchInput,
     searchChapter,
+    fetchPopularManga,
   }
 })

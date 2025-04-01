@@ -13,9 +13,7 @@ export default defineConfig({
     port: 4200,
     proxy: {
       '/api': {
-        target: 'https://manga-scrapers.onrender.com/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        target: 'https://manga-scrapers.onrender.com',
       },
     },
   },
@@ -35,7 +33,7 @@ export default defineConfig({
         },
       },
     },
-    // Ensure modules are processed correctly
+
     modulePreload: {
       polyfill: true,
     },
