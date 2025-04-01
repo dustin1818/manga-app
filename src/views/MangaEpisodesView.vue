@@ -4,11 +4,13 @@ import { reactive, computed, watch } from 'vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import ScrollTop from 'primevue/scrolltop'
 import Button from 'primevue/button'
+import { useMangaStore } from '@/state/store'
 import apiClient from '@/services/api'
 
 const route = useRoute()
+const mangaStore = useMangaStore()
+const mangaId = computed(() => mangaStore.mangaId)
 
-// Use reactive to create a single state object
 const state = reactive({
   chapterId: route.params.id,
   pages: [],
@@ -16,7 +18,6 @@ const state = reactive({
   error: null,
 })
 
-// Create a reactive object for currentPage
 const currentPage = computed(() => {
   const chapterNum = parseInt(state.chapterId.split('-').pop())
   return {
@@ -31,26 +32,20 @@ const getPages = async () => {
   state.error = null
 
   try {
-    console.log('Fetching pages for chapter:', state.chapterId)
     const response = await apiClient.get(`/asurascans/pages/${state.chapterId}`)
-    console.log('Response received:', response)
 
     if (response.data && response.data.results) {
       state.pages = response.data.results
-      console.log('Pages loaded:', state.pages.length)
     } else {
-      console.error('Invalid response format:', response.data)
       state.error = 'Invalid response data format'
     }
   } catch (err) {
-    console.error('Error fetching pages:', err)
     state.error = err.message || 'Failed to fetch manga pages'
   } finally {
     state.loading = false
   }
 }
 
-// Update chapterId when route changes
 watch(
   () => route.params.id,
   (newId) => {
@@ -69,9 +64,6 @@ const previousChapterUrl = computed(() =>
 const nextChapterUrl = computed(() =>
   currentPage.value.current !== 214 ? chapterUrl(currentPage.value.next) : 214,
 )
-
-// No need for the onMounted API call since watch with immediate:true
-// will handle the initial API call
 </script>
 
 <template>
@@ -86,7 +78,7 @@ const nextChapterUrl = computed(() =>
         <p>{{ state.error }}</p>
         <Button label="Retry" icon="pi pi-refresh" @click="getPages()" class="mt-4" />
         <div class="mt-4">
-          <RouterLink to="/asurascans/info/leviathan">
+          <RouterLink to="`/asurascans/info/${state.chapterId.split('-')[0]}`">
             <Button iconPos="left" label="Back to Info page" icon="pi pi-arrow-left" size="small" />
           </RouterLink>
         </div>
@@ -122,7 +114,7 @@ const nextChapterUrl = computed(() =>
       />
 
       <div class="button-container flex flex-wrap justify-center items-center mt-5 gap-5">
-        <RouterLink to="/asurascans/info/leviathan">
+        <RouterLink :to="`/asurascans/info/${mangaId}`">
           <Button iconPos="left" label="Info page" icon="pi pi-book" size="large" />
         </RouterLink>
         <RouterLink v-if="previousChapterUrl" :to="previousChapterUrl">

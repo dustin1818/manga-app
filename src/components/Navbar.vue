@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 </script>
 
@@ -8,7 +7,6 @@ import { RouterLink } from 'vue-router'
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <!-- Logo -->
           <RouterLink to="/" class="flex-shrink-0 flex items-center">
             <svg
               width="35"
@@ -42,6 +40,18 @@ import { RouterLink } from 'vue-router'
               class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500"
             >
               Popular
+            </RouterLink>
+            <RouterLink
+              to="/asurascans/latest"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500"
+            >
+              Latest
+            </RouterLink>
+            <RouterLink
+              to="/asurascans/search"
+              class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500"
+            >
+              Search
             </RouterLink>
           </div>
         </div>

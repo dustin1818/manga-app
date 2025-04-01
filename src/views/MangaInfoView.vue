@@ -1,12 +1,13 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import SocialShareButtons from '@/components/SocialShareButtons.vue'
 import EpisodesList from '@/components/EpisodesList.vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import { useMangaStore } from '@/state/store'
 
+const route = useRoute()
 const mangaStore = useMangaStore()
 const showMoreInfo = ref(false)
 const toggleMoreInfo = () => {
@@ -18,7 +19,16 @@ const genres = computed(() => {
 })
 
 onMounted(() => {
-  mangaStore.fetchMangaInfo()
+  if (
+    route.params.id &&
+    (!mangaStore.mangaId.value || mangaStore.mangaId.value !== route.params.id)
+  ) {
+    mangaStore.manga.loading = true
+    mangaStore.manga.error = null
+    mangaStore.fetchMangaInfo()
+  } else if (mangaStore.mangaId.value) {
+    mangaStore.fetchMangaInfo()
+  }
 })
 </script>
 
@@ -46,10 +56,13 @@ onMounted(() => {
       </div>
 
       <div class="info-wrapper text-center md:text-start md:col-span-3">
-        <span class="text-2xl font-bold">{{ mangaStore.mangaId.toLocaleUpperCase() }}</span>
-        <p class="mt-2 mb-8">Leviathan, Simhaesu, Deepwater</p>
-        <div class="btn-container w-full flex justify-center md:justify-start flex-wrap gap-3 mb-8">
-          <RouterLink to="/asurascans/pages/leviathan-chapter-1">
+        <span class="text-2xl font-bold">{{ mangaStore.mangaId?.toLocaleUpperCase() }}</span>
+        <div
+          class="btn-container mt-8 w-full flex justify-center md:justify-start flex-wrap gap-3 mb-8"
+        >
+          <RouterLink
+            :to="`/asurascans/pages/${mangaStore.manga.data.chapters[mangaStore.manga.data.chapters.length - 1].id}`"
+          >
             <Button label="Start Reading" icon="pi pi-play" iconPos="right" raised />
           </RouterLink>
           <Button
@@ -86,14 +99,14 @@ onMounted(() => {
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
                 <span class="text-gray-600">Author and Artist:</span>
                 <span class="text-black"
-                  >{{ mangaStore.manga.data.author[0] }},
-                  {{ mangaStore.manga.data.artists[0] }}</span
+                  >{{ mangaStore.manga.data.author?.map((author) => author) }},
+                  {{ mangaStore.manga.data.artists?.map((artist) => artist) }}</span
                 >
               </div>
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
                 <span class="text-gray-600">Published:</span>
-                <span class="text-black">{{ mangaStore.manga.data.year }}</span>
+                <span class="text-black">{{ mangaStore.manga.data?.year }}</span>
               </div>
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
@@ -111,7 +124,9 @@ onMounted(() => {
 
               <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                 <span class="text-gray-600">Magazines:</span>
-                <span class="text-black">{{ mangaStore.manga.data.serialization[0] }}</span>
+                <span class="text-black">{{
+                  mangaStore.manga.data?.serialization?.map((manga) => manga)
+                }}</span>
               </div>
             </div>
 
