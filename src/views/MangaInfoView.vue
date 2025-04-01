@@ -43,7 +43,12 @@ onMounted(() => {
     <div class="text-center">
       <h2 class="text-red-500 text-xl mb-2">Error loading manga</h2>
       <p>{{ mangaStore.manga.error }}</p>
-      <Button label="Retry" icon="pi pi-refresh" @click="window.location.reload()" class="mt-4" />
+      <Button
+        label="Retry"
+        icon="pi pi-refresh"
+        @click="mangaStore.fetchMangaInfo()"
+        class="mt-4"
+      />
     </div>
   </div>
 
@@ -58,12 +63,14 @@ onMounted(() => {
       </div>
 
       <div class="info-wrapper text-center md:text-start md:col-span-3">
-        <span class="text-2xl font-bold">{{ mangaStore.mangaId?.toLocaleUpperCase() }}</span>
+        <span class="text-2xl text-gray-800 font-bold">{{
+          mangaStore.mangaId?.toLocaleUpperCase()
+        }}</span>
         <div
           class="btn-container mt-8 w-full flex justify-center md:justify-start flex-wrap gap-3 mb-8"
         >
           <RouterLink
-            :to="`/asurascans/pages/${mangaStore.manga.data.chapters[mangaStore.manga.data.chapters?.length - 1].id}`"
+            :to="`/asurascans/pages/${mangaStore.manga.data.chapters?.length > 0 ? mangaStore.manga.data.chapters[mangaStore.manga.data.chapters?.length - 1].id : mangaStore.manga.data.chapters?.[0]?.id}`"
           >
             <Button label="Start Reading" icon="pi pi-play" iconPos="right" raised />
           </RouterLink>
@@ -76,7 +83,7 @@ onMounted(() => {
           />
         </div>
 
-        <p class="text-sm mb-6 md:text-base">
+        <p class="text-sm text-black mb-6 md:text-base">
           {{ mangaStore.manga.data.description }}
         </p>
         <SocialShareButtons :shareCount="42" :url="``" :title="``" />
